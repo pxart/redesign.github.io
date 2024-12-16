@@ -84,27 +84,21 @@
         <script>
     async function connectWallet() {
         try {
-            // The message to be signed
-            const message = "Sign this message to verify your wallet.";
+            const message = "Test message"; // Adjusted message
+            const base64Message = btoa(message); // Convert to Base64
+            const redirectURL = encodeURIComponent("https://pxart.github.io/redesign.github.io/"); // Replace with your callback URL
 
-            // Encode the message in Base64
-            const base64Message = btoa(message);
-
-            // Specify the redirect URL (ensure it points to your HTTPS callback)
-            const redirectURL = encodeURIComponent("hhttps://pxart.github.io/redesign.github.io/callback");
-
-            // Construct the Phantom deep link
+            // Construct Phantom deep link
             const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
 
-            // Redirect the user to the Phantom app
+            // Redirect to Phantom app
             window.location.href = phantomURI;
         } catch (err) {
-            console.error("Error connecting wallet:", err);
+            console.error("Error while connecting wallet:", err);
             alert("An error occurred. Please try again.");
         }
     }
 </script>
-
 
 
     </head>
