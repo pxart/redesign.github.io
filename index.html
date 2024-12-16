@@ -82,35 +82,31 @@
             }
         </style>
         <script>
-            async function connectWallet() {
-                try {
-                    if (window.solana && window.solana.isPhantom) {
-                        const response = await window.solana.connect();
-                        const publicKey = response.publicKey.toString();
+    async function connectWallet() {
+        try {
+            if (window.solana && window.solana.isPhantom) {
+                const response = await window.solana.connect();
+                const publicKey = response.publicKey.toString();
+                alert(`Wallet connected: ${publicKey}`);
 
-                        alert(`Wallet connected: ${publicKey}`);
+                const message = "Sign this message to verify your wallet.";
+                const encodedMessage = new TextEncoder().encode(message);
+                const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
 
-                        // Perform signature request
-                        const message = "Sign this message to verify your wallet.";
-                        const encodedMessage = new TextEncoder().encode(message);
-                        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
-
-                        console.log("Signature: ", signedMessage);
-                    } else {
-                        alert("Phantom wallet not found. Please open Phantom app.");
-                        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                        if (/android/i.test(userAgent)) {
-                            window.location.href = "phantom://";
-                        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                            window.location.href = "phantom://";
-                        } else {
-                            window.open("https://phantom.app", "_blank");
-                        }
-                    }
-                } catch (err) {
-                    console.error("Wallet connection failed:", err);
-                }
+                console.log("Signature: ", signedMessage);
+            } else {
+                alert("Phantom wallet not found. Attempting to open Phantom app...");
+                const phantomURI = `phantom://action=signMessage&message=${encodeURIComponent(
+                    "Sign this message to verify your wallet."
+                )}`;
+                window.location.href = phantomURI;
             }
+        } catch (err) {
+            console.error("Wallet connection failed:", err);
+        }
+    }
+</script>
+
         </script>
     </head>
     <body>
