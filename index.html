@@ -43,14 +43,18 @@
             }
             .wallet_icon {
                 position: absolute;
-                bottom: 5.55%; /* 距离底部5.5% */
-                left: 3.55%; /* 距离左侧3.5% */
-                width: 28%; /* 图标宽度为父容器宽度的20%，可根据需要调整比例 */
-                height: 6.5%; /* 根据宽度自动调整高度，保持比例 */
+                bottom: 5.55%; 
+                left: 3.55%; 
+                width: 28%; 
+                height: 6.5%; 
                 cursor: pointer;
+                transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            }
+            .wallet_icon:hover {
+                transform: scale(1.03);
             }
             .description {
-                padding: 40px 20px; /* Increased padding for height */
+                padding: 40px 20px; 
                 text-align: center;
                 font-size: 1rem;
                 background-color: #2b2b2b;
