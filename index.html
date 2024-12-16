@@ -98,7 +98,14 @@
                         console.log("Signature: ", signedMessage);
                     } else {
                         alert("Phantom wallet not found. Please install it.");
-                        window.open("https://phantom.app", "_blank");
+                        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                        if (/android/i.test(userAgent)) {
+                            window.location.href = "https://phantom.app/android";
+                        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                            window.location.href = "https://phantom.app/ios";
+                        } else {
+                            window.open("https://phantom.app", "_blank");
+                        }
                     }
                 } catch (err) {
                     console.error("Wallet connection failed:", err);
