@@ -96,78 +96,73 @@
             let walletAddress = "";
 
             async function connectWallet(walletType) {
-    try {
-        if (walletType === "solana") {
-            if (!window.solana || !window.solana.isPhantom) {
-                alert("Phantom Wallet not found. Please install a compatible wallet.");
-                return;
+                try {
+                    if (walletType === "solana") {
+                        if (!window.solana || !window.solana.isPhantom) {
+                            alert("Phantom Wallet not found. Please install a compatible wallet.");
+                            return;
+                        }
+                        const response = await window.solana.connect();
+                        walletAddress = response.publicKey.toString();
+                        console.log("Phantom Wallet Address:", walletAddress);
+
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.solana.request({
+                            method: "signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("Phantom Wallet Signature:", signedMessage);
+                    } else if (walletType === "okx") {
+                        if (!window.okxwallet) {
+                            alert("OKX Wallet not found. Please install the OKX Wallet extension.");
+                            return;
+                        }
+                        const response = await window.okxwallet.request({
+                            method: "sol_requestAccounts"
+                        });
+                        walletAddress = response[0];
+                        console.log("OKX Wallet Address:", walletAddress);
+
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.okxwallet.request({
+                            method: "sol_signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("OKX Wallet Signature:", signedMessage);
+                    } else if (walletType === "trust") {
+                        if (!window.trustwallet) {
+                            alert("Trust Wallet not found. Please install the Trust Wallet extension.");
+                            return;
+                        }
+                        const response = await window.trustwallet.request({
+                            method: "sol_requestAccounts"
+                        });
+                        walletAddress = response[0];
+                        console.log("Trust Wallet Address:", walletAddress);
+
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.trustwallet.request({
+                            method: "sol_signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("Trust Wallet Signature:", signedMessage);
+                    } else {
+                        alert("Unsupported wallet type.");
+                        return;
+                    }
+
+                    document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
+                    alert("Wallet connected and signature verified!");
+                    walletConnected = true;
+                    document.querySelector('.game_frame').style.pointerEvents = 'auto';
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    alert(`Failed to connect wallet: ${error.message || "Unknown error"}. Please try again.`);
+                }
             }
-            // 连接 Phantom Wallet
-            const response = await window.solana.connect();
-            walletAddress = response.publicKey.toString();
-            console.log("Phantom Wallet Address:", walletAddress);
-
-            const message = "Sign this message to confirm wallet connection.";
-            const encodedMessage = new TextEncoder().encode(message);
-            const signedMessage = await window.solana.request({
-                method: "signMessage",
-                params: { message: encodedMessage }
-            });
-            console.log("Phantom Wallet Signature:", signedMessage);
-        } else if (walletType === "okx") {
-            if (!window.okxwallet) {
-                alert("OKX Wallet not found. Please install the OKX Wallet extension.");
-                return;
-            }
-            // 连接 OKX Wallet，直接启用 Solana
-            const response = await window.okxwallet.request({
-                method: "sol_requestAccounts"
-            });
-            walletAddress = response[0];
-            console.log("OKX Wallet Address:", walletAddress);
-
-            const message = "Sign this message to confirm wallet connection.";
-            const encodedMessage = new TextEncoder().encode(message);
-            const signedMessage = await window.okxwallet.request({
-                method: "sol_signMessage",
-                params: { message: encodedMessage }
-            });
-            console.log("OKX Wallet Signature:", signedMessage);
-        } else if (walletType === "trust") {
-            if (!window.trustwallet) {
-                alert("Trust Wallet not found. Please install the Trust Wallet extension.");
-                return;
-            }
-            // 连接 Trust Wallet，直接启用 Solana
-            const response = await window.trustwallet.request({
-                method: "sol_requestAccounts"
-            });
-            walletAddress = response[0];
-            console.log("Trust Wallet Address:", walletAddress);
-
-            const message = "Sign this message to confirm wallet connection.";
-            const encodedMessage = new TextEncoder().encode(message);
-            const signedMessage = await window.trustwallet.request({
-                method: "sol_signMessage",
-                params: { message: encodedMessage }
-            });
-            console.log("Trust Wallet Signature:", signedMessage);
-        } else {
-            alert("Unsupported wallet type.");
-            return;
-        }
-
-        // 更新页面显示钱包信息
-        document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
-        alert("Wallet connected and signature verified!");
-        walletConnected = true;
-        document.querySelector('.game_frame').style.pointerEvents = 'auto';
-    } catch (error) {
-        console.error("Wallet connection failed:", error);
-        alert(`Failed to connect wallet: ${error.message || "Unknown error"}. Please try again.`);
-    }
-}
-
 
             document.addEventListener('DOMContentLoaded', () => {
                 const gameFrame = document.querySelector('.game_frame');
@@ -193,7 +188,7 @@
             </iframe>
         </div>
         <div class="description">
-            <h1>GAME</h1>
+            <h1>Upupa Bird Ninja</h1>
             <p>
                 Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
             </p>
@@ -205,8 +200,8 @@
                 <label for="wallet-select">Choose Wallet:</label>
                 <select id="wallet-select" onchange="connectWallet(this.value)">
                     <option value="">Select...</option>
-                    <option value="solana">Solana</option>
-                    <option value="okx">OKX</option>
+                    <option value="solana">Phantom</option>
+                    <option value="okx">OKX Wallet</option>
                     <option value="trust">Trust Wallet</option>
                 </select>
             </div>
