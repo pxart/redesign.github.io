@@ -84,38 +84,22 @@
         <script>
     async function connectWallet() {
         try {
-            if (window.solana && window.solana.isPhantom) {
-                const response = await window.solana.connect();
-                const publicKey = response.publicKey.toString();
-                alert(`Wallet connected: ${publicKey}`);
+            const message = "Sign this message to verify your wallet.";
+            const base64Message = btoa(message); // Convert message to Base64
 
-                // Request signature via Phantom extension
-                const message = "Sign this message to verify your wallet.";
-                const encodedMessage = new TextEncoder().encode(message);
-                const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+            // Set up Phantom deep link for signing
+            const redirectURL = encodeURIComponent("https://your-dapp-url.com/callback"); // Replace with your actual callback URL
+            const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
 
-                console.log("Signature:", signedMessage);
-                alert(`Signed message: ${new TextDecoder().decode(signedMessage.signature)}`);
-            } else {
-                // Mobile Phantom App deep link
-                alert("Redirecting to Phantom app for signing...");
-
-                const message = "Sign this message to verify your wallet.";
-                const base64Message = btoa(message); // Convert to Base64
-                const redirectURL = encodeURIComponent("https://your-dapp-url.com/callback"); // Replace with your callback URL
-
-                // Construct deep link
-                const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
-
-                // Redirect to Phantom App
-                window.location.href = phantomURI;
-            }
+            // Redirect to Phantom app
+            window.location.href = phantomURI;
         } catch (err) {
-            console.error("Wallet connection failed:", err);
-            alert("Wallet connection failed. Please try again.");
+            console.error("Error while connecting wallet:", err);
+            alert("An error occurred. Please try again.");
         }
     }
 </script>
+
 
     </head>
     <body>
