@@ -78,6 +78,11 @@
                 color: #ffffff;
                 font-size: 1rem;
             }
+            .wallet-selector {
+                margin-top: 20px;
+                color: #ffffff;
+                font-size: 1rem;
+            }
             iframe {
                 width: 100%;
                 height: 100%;
@@ -89,22 +94,29 @@
             let walletConnected = false;
             let walletAddress = "";
 
-            async function connectWallet() {
+            async function connectWallet(walletType) {
                 try {
-                    if (!window.solana) {
-                        alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                    if (walletType === "solana") {
+                        if (!window.solana) {
+                            alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                            return;
+                        }
+                        const response = await window.solana.connect();
+                        walletAddress = response.publicKey.toString();
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+                        console.log("Solana Wallet Signature:", signedMessage.signature);
+                    } else if (walletType === "okx") {
+                        alert("Connecting to OKX wallet... (Integration in progress)");
+                        // Add OKX Wallet SDK and logic here
+                    } else if (walletType === "trust") {
+                        alert("Connecting to Trust Wallet... (Integration in progress)");
+                        // Add Trust Wallet SDK and logic here
+                    } else {
+                        alert("Unsupported wallet type.");
                         return;
                     }
-
-                    const response = await window.solana.connect();
-                    walletAddress = response.publicKey.toString();
-                    console.log("Connected wallet:", walletAddress);
-
-                    const message = "Sign this message to confirm wallet connection.";
-                    const encodedMessage = new TextEncoder().encode(message);
-                    const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
-
-                    console.log("Signature:", signedMessage.signature);
 
                     document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
                     alert("Wallet connected and signature verified!");
@@ -148,7 +160,15 @@
             <a href="https://example.com" target="_blank">
                 <img src="https://via.placeholder.com/100x65" alt="Link Image" />
             </a>
-            <img class="wallet-button" src="https://via.placeholder.com/100x30" alt="Connect Wallet" onclick="connectWallet()" />
+            <div class="wallet-selector">
+                <label for="wallet-select">Choose Wallet:</label>
+                <select id="wallet-select" onchange="connectWallet(this.value)">
+                    <option value="">Select...</option>
+                    <option value="solana">Solana</option>
+                    <option value="okx">OKX</option>
+                    <option value="trust">Trust Wallet</option>
+                </select>
+            </div>
             <div id="wallet-info" class="wallet-info"></div>
         </div>
     </body>
