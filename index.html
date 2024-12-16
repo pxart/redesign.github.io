@@ -73,6 +73,11 @@
                 height: 30px;
                 cursor: pointer;
             }
+            .wallet-info {
+                margin-top: 20px;
+                color: #ffffff;
+                font-size: 1rem;
+            }
             iframe {
                 width: 100%;
                 height: 100%;
@@ -82,6 +87,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/@solana/web3.js/1.75.0/web3.min.js"></script>
         <script>
             let walletConnected = false;
+            let walletAddress = "";
 
             async function connectWallet() {
                 try {
@@ -91,7 +97,8 @@
                     }
 
                     const response = await window.solana.connect();
-                    console.log("Connected wallet:", response.publicKey.toString());
+                    walletAddress = response.publicKey.toString();
+                    console.log("Connected wallet:", walletAddress);
 
                     const message = "Sign this message to confirm wallet connection.";
                     const encodedMessage = new TextEncoder().encode(message);
@@ -99,6 +106,7 @@
 
                     console.log("Signature:", signedMessage.signature);
 
+                    document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
                     alert("Wallet connected and signature verified!");
                     walletConnected = true;
                     document.querySelector('.game_frame').style.pointerEvents = 'auto';
@@ -141,6 +149,7 @@
                 <img src="https://via.placeholder.com/100x65" alt="Link Image" />
             </a>
             <img class="wallet-button" src="https://via.placeholder.com/100x30" alt="Connect Wallet" onclick="connectWallet()" />
+            <div id="wallet-info" class="wallet-info"></div>
         </div>
     </body>
 </html>
