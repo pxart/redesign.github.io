@@ -43,14 +43,26 @@
             }
             .wallet_icon {
                 position: absolute;
-                top: 10px;
-                left: 10px;
-                width: 50px;
-                height: 50px;
+                bottom: 34px;
+                left: 34px;
+                width: 250px;
+                height: 39px;
                 cursor: pointer;
+                transition: opacity 1s ease-in-out;
+            }
+            .wallet_icon.hidden {
+                animation: fadeOut 1s forwards; /* 使用动画隐藏图标 */
+            }
+            @keyframes fadeOut {
+                from {
+                    opacity: 1;
+                }
+                to {
+                    opacity: 0;
+                }
             }
             .description {
-                padding: 40px 20px; /* Increased padding for height */
+                padding: 40px 20px;
                 text-align: center;
                 font-size: 1rem;
                 background-color: #2b2b2b;
@@ -90,6 +102,7 @@
             </button>
             <img src="https://via.placeholder.com/50" alt="Wallet" class="wallet_icon" id="walletIcon"/>
             <iframe
+                id="unity-canvas"
                 src="https://html-classic.itch.zone/html/12246759/index.html"
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
                 allowfullscreen>
@@ -108,6 +121,7 @@
         </div>
 
         <script>
+            // 钱包连接逻辑
             document.getElementById('walletIcon').addEventListener('click', async () => {
                 if (!window.solana || !window.solana.isPhantom) {
                     alert('Phantom wallet not detected. Please install it from the Chrome Web Store.');
@@ -126,6 +140,16 @@
                     console.error('Error during wallet connection:', error);
                     alert('Wallet connection failed.');
                 }
+            });
+
+            // 监听游戏窗口点击事件
+            document.querySelector('#unity-canvas').addEventListener('click', () => {
+                const walletIcon = document.getElementById('walletIcon'); // 选择钱包图标
+                walletIcon.classList.add('hidden'); // 添加隐藏动画类
+                setTimeout(() => {
+                    walletIcon.style.display = 'none'; // 动画结束后彻底隐藏
+                }, 1000); // 1秒对应CSS动画时间
+                console.log('Wallet icon fading out after canvas click');
             });
         </script>
     </body>
