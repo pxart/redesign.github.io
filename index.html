@@ -4,12 +4,16 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta name="theme-color" content="#252525"/>
-        <title>Wallet Integration</title>
+        <title>Upupa Bird Ninja</title>
         <style>
             body {
                 margin: 0;
-                font-family: Arial, sans-serif;
+                font-family: Inter, sans-serif;
                 background-color: #252525;
+                background-image: url(https://img.itch.zone/aW1nLzE3MjY2NjA0LmpwZw==/original/RcoHTc.jpg);
+                background-repeat: repeat-x;
+                background-position: center;
+                background-attachment: fixed;
                 color: #ffffff;
                 display: flex;
                 flex-direction: column;
@@ -17,158 +21,186 @@
                 justify-content: center;
                 min-height: 100vh;
             }
-            .wallet-selector {
-                margin: 20px;
+            .game_frame {
+                width: 100%;
+                max-width: 960px;
+                height: calc(100vw * 0.625); /* Maintain 16:10 aspect ratio */
+                max-height: 600px;
+                background-color: #2b2b2b;
+                position: relative;
+                pointer-events: none; /* Disable interactions initially */
+            }
+            .fullscreen_btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
+            .fullscreen_btn img {
+                width: 24px;
+                height: 24px;
+            }
+            .description {
+                padding: 40px 20px; /* Increased padding for height */
+                text-align: center;
+                font-size: 1rem;
+                background-color: #2b2b2b;
+                color: #ffffff;
+                width: 100%;
+                max-width: 960px;
+                box-sizing: border-box;
+                position: relative;
+            }
+            .description h1 {
+                margin: 0;
+                font-size: 2rem;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .description img {
+                margin-top: 20px;
+                width: 100px;
+                height: 65px;
+                cursor: pointer;
+            }
+            .wallet-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 100px;
+                height: 30px;
+                cursor: pointer;
             }
             .wallet-info {
                 margin-top: 20px;
                 color: #ffffff;
                 font-size: 1rem;
             }
-            .game_frame {
+            .wallet-selector {
+                margin-top: 20px;
+                color: #ffffff;
+                font-size: 1rem;
+            }
+            iframe {
                 width: 100%;
-                max-width: 960px;
-                height: 400px;
-                background-color: #2b2b2b;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                pointer-events: none;
+                height: 100%;
+                border: none;
             }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/@solana/web3.js/1.75.0/web3.min.js"></script>
-        <script src="https://static.okx.com/cdn-wallet-sdk/okxwallet.min.js"></script>
         <script>
-            let walletConnected = false;
-            let walletAddress = "";
+    let walletConnected = false;
+    let walletAddress = "";
 
-            // Phantom Wallet (Solana)
-            async function connectPhantomWallet() {
-                try {
-                    if (!window.solana) {
-                        alert("Phantom wallet not found. Please install it first.");
-                        return;
-                    }
-                    const response = await window.solana.connect();
-                    walletAddress = response.publicKey.toString();
-
-                    const message = "Sign this message to confirm wallet connection.";
-                    const encodedMessage = new TextEncoder().encode(message);
-                    const signedMessage = await window.solana.request({
-                        method: "signMessage",
-                        params: {
-                            message: encodedMessage,
-                            display: "utf8",
-                        },
-                    });
-
-                    alert(`Phantom Wallet connected. Signature: ${signedMessage.signature}`);
-                    walletConnected = true;
-                    updateWalletInfo();
-                } catch (error) {
-                    console.error("Phantom Wallet connection failed:", error);
-                    alert("Failed to connect Phantom Wallet.");
+    async function connectWallet(walletType) {
+        try {
+            if (walletType === "solana") {
+                if (!window.solana || !window.solana.isPhantom) {
+                    alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                    return;
                 }
-            }
-
-            // OKX Wallet
-            async function connectOKXWallet() {
-                try {
-                    const okxWallet = window.okxwallet;
-                    if (!okxWallet) {
-                        alert("OKX wallet not found. Please install it first.");
-                        return;
-                    }
-
-                    const accounts = await okxWallet.requestAccounts();
-                    walletAddress = accounts[0];
-
-                    const message = "Sign this message to confirm wallet connection.";
-                    const signedMessage = await okxWallet.signMessage({
-                        address: walletAddress,
-                        message,
-                    });
-
-                    alert(`OKX Wallet connected. Signature: ${signedMessage}`);
-                    walletConnected = true;
-                    updateWalletInfo();
-                } catch (error) {
-                    console.error("OKX Wallet connection failed:", error);
-                    alert("Failed to connect OKX Wallet.");
+                // Connect to Phantom wallet
+                const response = await window.solana.connect();
+                walletAddress = response.publicKey.toString();
+                const message = "Sign this message to confirm wallet connection.";
+                const encodedMessage = new TextEncoder().encode(message);
+                const signedMessage = await window.solana.request({
+                    method: "signMessage",
+                    params: { message: encodedMessage }
+                });
+                console.log("Solana Wallet Signature:", signedMessage);
+            } else if (walletType === "okx") {
+                // OKX Wallet Integration
+                if (!window.okxwallet) {
+                    alert("OKX Wallet not found. Please install the OKX Wallet extension.");
+                    return;
                 }
-            }
-
-            // Trust Wallet (Ethereum)
-            async function connectTrustWallet() {
-                try {
-                    if (!window.ethereum) {
-                        alert("Trust Wallet not found. Please install it first.");
-                        return;
-                    }
-
-                    const accounts = await window.ethereum.request({
-                        method: "eth_requestAccounts",
-                    });
-                    walletAddress = accounts[0];
-
-                    const message = "Sign this message to confirm wallet connection.";
-                    const from = walletAddress;
-                    const params = [message, from];
-                    const method = "personal_sign";
-
-                    const signature = await window.ethereum.request({
-                        method,
-                        params,
-                        from,
-                    });
-
-                    alert(`Trust Wallet connected. Signature: ${signature}`);
-                    walletConnected = true;
-                    updateWalletInfo();
-                } catch (error) {
-                    console.error("Trust Wallet connection failed:", error);
-                    alert("Failed to connect Trust Wallet.");
+                const accounts = await window.okxwallet.request({
+                    method: "eth_requestAccounts"
+                });
+                walletAddress = accounts[0];
+                const message = "Sign this message to confirm wallet connection.";
+                const signedMessage = await window.okxwallet.request({
+                    method: "personal_sign",
+                    params: [message, walletAddress]
+                });
+                console.log("OKX Wallet Signature:", signedMessage);
+            } else if (walletType === "trust") {
+                // Trust Wallet Integration (uses Ethereum-compatible providers)
+                if (!window.ethereum) {
+                    alert("Trust Wallet not found. Please install Trust Wallet or MetaMask.");
+                    return;
                 }
+                const accounts = await window.ethereum.request({
+                    method: "eth_requestAccounts"
+                });
+                walletAddress = accounts[0];
+                const message = "Sign this message to confirm wallet connection.";
+                const signedMessage = await window.ethereum.request({
+                    method: "personal_sign",
+                    params: [message, walletAddress]
+                });
+                console.log("Trust Wallet Signature:", signedMessage);
+            } else {
+                alert("Unsupported wallet type.");
+                return;
             }
 
-            // Update Wallet Info on UI
-            function updateWalletInfo() {
-                document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
-                document.querySelector(".game_frame").style.pointerEvents = "auto";
-            }
+            document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
+            alert("Wallet connected and signature verified!");
+            walletConnected = true;
+            document.querySelector('.game_frame').style.pointerEvents = 'auto';
+        } catch (error) {
+            console.error("Wallet connection failed:", error);
+            alert("Failed to connect wallet. Please try again.");
+        }
+    }
 
-            // Wallet Selector Event
-            function connectWallet(walletType) {
-                switch (walletType) {
-                    case "phantom":
-                        connectPhantomWallet();
-                        break;
-                    case "okx":
-                        connectOKXWallet();
-                        break;
-                    case "trust":
-                        connectTrustWallet();
-                        break;
-                    default:
-                        alert("Invalid wallet type selected.");
-                }
+    document.addEventListener('DOMContentLoaded', () => {
+        const gameFrame = document.querySelector('.game_frame');
+
+        gameFrame.addEventListener('click', (e) => {
+            if (!walletConnected) {
+                e.preventDefault();
+                alert("Please connect your wallet to start the game.");
             }
-        </script>
+        });
+    });
+</script>
+
     </head>
     <body>
-        <h1>Wallet Integration Demo</h1>
-        <div class="wallet-selector">
-            <label for="wallet-select">Choose Wallet:</label>
-            <select id="wallet-select" onchange="connectWallet(this.value)">
-                <option value="">Select...</option>
-                <option value="phantom">Phantom Wallet</option>
-                <option value="okx">OKX Wallet</option>
-                <option value="trust">Trust Wallet</option>
-            </select>
-        </div>
-        <div id="wallet-info" class="wallet-info"></div>
         <div class="game_frame">
-            <p>Game content will unlock after wallet connection.</p>
+            <button title="Enter fullscreen" class="fullscreen_btn">
+                <img src="https://itch.io/static/images/enlarge.svg?1734309005" alt="Fullscreen"/>
+            </button>
+            <iframe
+                src="https://html-classic.itch.zone/html/12246759/index.html"
+                allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="description">
+            <h1>GAME</h1>
+            <p>
+                Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
+            </p>
+            <p><em>Note: plays best with mouse or controller. Touch input not fully supported.</em></p>
+            <a href="https://example.com" target="_blank">
+                <img src="https://via.placeholder.com/100x65" alt="Link Image" />
+            </a>
+            <div class="wallet-selector">
+                <label for="wallet-select">Choose Wallet:</label>
+                <select id="wallet-select" onchange="connectWallet(this.value)">
+                    <option value="">Select...</option>
+                    <option value="solana">Solana</option>
+                    <option value="okx">OKX</option>
+                    <option value="trust">Trust Wallet</option>
+                </select>
+            </div>
+            <div id="wallet-info" class="wallet-info"></div>
         </div>
     </body>
 </html>
