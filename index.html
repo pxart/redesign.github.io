@@ -1,3 +1,4 @@
+
 <!DOCTYPE HTML>
 <html lang="en">
     <head>
@@ -95,104 +96,78 @@
             let walletAddress = "";
 
             async function connectWallet(walletType) {
-    try {
-        if (walletType === "solana") {
-            // Phantom Wallet for Solana
-            if (!window.solana || !window.solana.isPhantom) {
-                alert("Solana wallet not found. Please install Phantom Wallet.");
-                return;
+                try {
+                    if (walletType === "solana") {
+                        if (!window.solana || !window.solana.isPhantom) {
+                            alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                            return;
+                        }
+                        const response = await window.solana.connect();
+                        walletAddress = response.publicKey.toString();
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.solana.request({
+                            method: "signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("Phantom Wallet Signature:", signedMessage);
+                    } else if (walletType === "okx") {
+                        if (!window.okxwallet) {
+                            alert("OKX Wallet not found. Please install the OKX Wallet extension.");
+                            return;
+                        }
+                        const response = await window.okxwallet.request({
+                            method: "sol_requestAccounts"
+                        });
+                        walletAddress = response[0];
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.okxwallet.request({
+                            method: "sol_signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("OKX Wallet Signature:", signedMessage);
+                    } else if (walletType === "trust") {
+                        if (!window.trustwallet) {
+                            alert("Trust Wallet not found. Please install Trust Wallet extension.");
+                            return;
+                        }
+                        const response = await window.trustwallet.request({
+                            method: "sol_requestAccounts"
+                        });
+                        walletAddress = response[0];
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.trustwallet.request({
+                            method: "sol_signMessage",
+                            params: { message: encodedMessage }
+                        });
+                        console.log("Trust Wallet Signature:", signedMessage);
+                    } else {
+                        alert("Unsupported wallet type.");
+                        return;
+                    }
+
+                    document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
+                    alert("Wallet connected and signature verified!");
+                    walletConnected = true;
+                    document.querySelector('.game_frame').style.pointerEvents = 'auto';
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    alert("Failed to connect wallet. Please try again.");
+                }
             }
-            const response = await window.solana.connect();
-            walletAddress = response.publicKey.toString();
-            console.log("Connected to Solana via Phantom Wallet:", walletAddress);
-        } else if (walletType === "okx" || walletType === "trust") {
-            // OKX Wallet or Trust Wallet (Default EVM, needs to switch to Solana)
-            if (!window.ethereum) {
-                alert("EVM-compatible wallet not found. Please install OKX Wallet or Trust Wallet.");
-                return;
-            }
-            // Request accounts from wallet
-            const accounts = await window.ethereum.request({
-                method: "eth_requestAccounts",
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const gameFrame = document.querySelector('.game_frame');
+
+                gameFrame.addEventListener('click', (e) => {
+                    if (!walletConnected) {
+                        e.preventDefault();
+                        alert("Please connect your wallet to start the game.");
+                    }
+                });
             });
-            walletAddress = accounts[0];
-
-            // Check if Solana network is supported (custom logic needed for OKX/Trust)
-            const isSolanaSupported = await checkSolanaSupport(walletType);
-            if (!isSolanaSupported) {
-                alert("Your wallet does not support Solana. Please use Phantom Wallet.");
-                return;
-            }
-
-            // If Solana supported, switch to Solana RPC
-            await switchToSolanaNetwork(walletType);
-
-            // Sign a message to confirm connection
-            const message = "Sign this message to confirm wallet connection to Solana.";
-            const signedMessage = await signMessage(walletType, message);
-            console.log("Connected to Solana via OKX/Trust Wallet:", signedMessage);
-        } else {
-            alert("Unsupported wallet type.");
-            return;
-        }
-
-        // Update UI
-        document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
-        alert("Wallet connected and signature verified!");
-        walletConnected = true;
-        document.querySelector(".game_frame").style.pointerEvents = "auto";
-    } catch (error) {
-        console.error("Wallet connection failed:", error);
-        alert("Failed to connect wallet. Please try again.");
-    }
-}
-
-// Helper to check if the wallet supports Solana
-async function checkSolanaSupport(walletType) {
-    if (walletType === "okx") {
-        return typeof window.okxwallet !== "undefined"; // Custom check for OKX
-    }
-    if (walletType === "trust") {
-        return typeof window.ethereum !== "undefined"; // Trust Wallet uses Ethereum provider
-    }
-    return false;
-}
-
-// Helper to switch to Solana network
-async function switchToSolanaNetwork(walletType) {
-    const solanaRpcUrl = "https://api.mainnet-beta.solana.com"; // Replace with your Solana RPC URL
-    if (walletType === "okx" || walletType === "trust") {
-        // Switch RPC to Solana
-        await window.ethereum.request({
-            method: "wallet_addEthereumChain", // May require custom method for Solana
-            params: [
-                {
-                    chainId: "0x1", // Solana's chain ID (use custom logic if needed)
-                    rpcUrls: [solanaRpcUrl],
-                    chainName: "Solana Mainnet",
-                    nativeCurrency: {
-                        name: "SOL",
-                        symbol: "SOL",
-                        decimals: 18,
-                    },
-                    blockExplorerUrls: ["https://explorer.solana.com"],
-                },
-            ],
-        });
-    }
-}
-
-// Helper to sign message
-async function signMessage(walletType, message) {
-    if (walletType === "okx" || walletType === "trust") {
-        const signedMessage = await window.ethereum.request({
-            method: "personal_sign",
-            params: [message, walletAddress],
-        });
-        return signedMessage;
-    }
-}
-
         </script>
     </head>
     <body>
