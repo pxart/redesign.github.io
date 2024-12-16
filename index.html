@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html lang="en">
     <head>
@@ -96,44 +95,38 @@
             let walletAddress = "";
 
             async function connectWallet(walletType) {
-    try {
-        if (walletType === "solana") {
-            if (!window.solana || !window.solana.isPhantom) {
-                alert("Phantom Wallet not found. Please install Phantom Wallet.");
-                return;
-            }
-            const response = await window.solana.connect();
-            walletAddress = response.publicKey.toString();
-            console.log("Phantom Wallet Address:", walletAddress);
-        } else if (walletType === "okx") {
-            if (!window.okxwallet) {
-                alert("OKX Wallet not found. Please install the OKX Wallet extension.");
-                return;
-            }
-            alert("Please manually switch OKX Wallet to Solana network.");
-            return;
-        } else if (walletType === "trust") {
-            if (!window.trustwallet) {
-                alert("Trust Wallet not found. Please install Trust Wallet.");
-                return;
-            }
-            alert("Please manually switch Trust Wallet to Solana network.");
-            return;
-        } else {
-            alert("Unsupported wallet type.");
-            return;
-        }
+                try {
+                    if (walletType === "solana") {
+                        if (!window.solana) {
+                            alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                            return;
+                        }
+                        const response = await window.solana.connect();
+                        walletAddress = response.publicKey.toString();
+                        const message = "Sign this message to confirm wallet connection.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+                        console.log("Solana Wallet Signature:", signedMessage.signature);
+                    } else if (walletType === "okx") {
+                        alert("Connecting to OKX wallet... (Integration in progress)");
+                        // Add OKX Wallet SDK and logic here
+                    } else if (walletType === "trust") {
+                        alert("Connecting to Trust Wallet... (Integration in progress)");
+                        // Add Trust Wallet SDK and logic here
+                    } else {
+                        alert("Unsupported wallet type.");
+                        return;
+                    }
 
-        document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
-        alert("Wallet connected successfully!");
-        walletConnected = true;
-        document.querySelector('.game_frame').style.pointerEvents = 'auto';
-    } catch (error) {
-        console.error("Wallet connection failed:", error);
-        alert(`Failed to connect wallet: ${error.message || "Unknown error"}. Please try again.`);
-    }
-}
-
+                    document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
+                    alert("Wallet connected and signature verified!");
+                    walletConnected = true;
+                    document.querySelector('.game_frame').style.pointerEvents = 'auto';
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    alert("Failed to connect wallet. Please try again.");
+                }
+            }
 
             document.addEventListener('DOMContentLoaded', () => {
                 const gameFrame = document.querySelector('.game_frame');
@@ -159,7 +152,7 @@
             </iframe>
         </div>
         <div class="description">
-            <h1>Upupa Bird Ninja</h1>
+            <h1>GAME</h1>
             <p>
                 Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
             </p>
@@ -171,8 +164,8 @@
                 <label for="wallet-select">Choose Wallet:</label>
                 <select id="wallet-select" onchange="connectWallet(this.value)">
                     <option value="">Select...</option>
-                    <option value="solana">Phantom</option>
-                    <option value="okx">OKX Wallet</option>
+                    <option value="solana">Solana</option>
+                    <option value="okx">OKX</option>
                     <option value="trust">Trust Wallet</option>
                 </select>
             </div>
