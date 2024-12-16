@@ -96,14 +96,15 @@
 
                 console.log("Signature: ", signedMessage);
             } else {
-                alert("Phantom wallet not found. Attempting to open Phantom app...");
+                alert("Phantom wallet not found. Redirecting to Phantom app...");
 
-                // Generate the Phantom deep link URI
+                // Construct the deep link for signing
                 const message = "Sign this message to verify your wallet.";
-                const encodedMessage = btoa(message); // Convert to base64
-                const phantomURI = `phantom://v1/sign?dapp_name=MyDApp&dapp_icon=https://example.com/icon.png&message=${encodedMessage}`;
+                const encodedMessage = btoa(message); // Convert to Base64 for Phantom
+                const redirectURL = encodeURIComponent("https://your-dapp-url.com"); // Your app's return URL
+                const phantomURI = `phantom://v1/sign?request=${encodedMessage}&redirect=${redirectURL}`;
 
-                // Redirect to Phantom app
+                // Redirect to Phantom
                 window.location.href = phantomURI;
             }
         } catch (err) {
@@ -111,6 +112,7 @@
         }
     }
 </script>
+
 
 
         </script>
