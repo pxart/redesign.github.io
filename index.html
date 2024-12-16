@@ -32,7 +32,7 @@
             .fullscreen_btn {
                 position: absolute;
                 top: 10px;
-                right: 50px; /* Adjusted to leave space for wallet icon */
+                right: 10px;
                 background: none;
                 border: none;
                 cursor: pointer;
@@ -41,17 +41,13 @@
                 width: 24px;
                 height: 24px;
             }
-            .wallet_btn {
+            .wallet_icon {
                 position: absolute;
                 top: 10px;
-                right: 10px;
-                background: none;
-                border: none;
+                left: 10px;
+                width: 50px;
+                height: 50px;
                 cursor: pointer;
-            }
-            .wallet_btn img {
-                width: 24px;
-                height: 24px;
             }
             .description {
                 padding: 40px 20px; /* Increased padding for height */
@@ -80,36 +76,19 @@
                 height: 100%;
                 border: none;
             }
+            .wallet_address {
+                margin-top: 10px;
+                color: #00ff00;
+                font-size: 1rem;
+            }
         </style>
-        <script>
-    async function connectWallet() {
-        try {
-            const message = "Test message"; // Adjusted message
-            const base64Message = btoa(message); // Convert to Base64
-            const redirectURL = encodeURIComponent("https://pxart.github.io/redesign.github.io/"); // Replace with your callback URL
-
-            // Construct Phantom deep link
-            const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
-
-            // Redirect to Phantom app
-            window.location.href = phantomURI;
-        } catch (err) {
-            console.error("Error while connecting wallet:", err);
-            alert("An error occurred. Please try again.");
-        }
-    }
-</script>
-
-
     </head>
     <body>
         <div class="game_frame">
             <button title="Enter fullscreen" class="fullscreen_btn">
                 <img src="https://itch.io/static/images/enlarge.svg?1734309005" alt="Fullscreen"/>
             </button>
-            <button title="Connect Wallet" class="wallet_btn" onclick="connectWallet()">
-                <img src="https://via.placeholder.com/24" alt="Wallet"/>
-            </button>
+            <img src="https://via.placeholder.com/50" alt="Wallet" class="wallet_icon" id="walletIcon"/>
             <iframe
                 src="https://html-classic.itch.zone/html/12246759/index.html"
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
@@ -125,6 +104,29 @@
             <a href="https://example.com" target="_blank">
                 <img src="https://via.placeholder.com/100x65" alt="Link Image" />
             </a>
+            <p id="walletAddress" class="wallet_address"></p>
         </div>
+
+        <script>
+            document.getElementById('walletIcon').addEventListener('click', async () => {
+                if (!window.solana || !window.solana.isPhantom) {
+                    alert('Phantom wallet not detected. Please install it from the Chrome Web Store.');
+                    return;
+                }
+
+                try {
+                    const response = await window.solana.connect();
+                    const publicKey = response.publicKey.toString();
+                    const message = 'Sign this message to confirm your wallet address.';
+                    const encodedMessage = new TextEncoder().encode(message);
+                    const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
+
+                    document.getElementById('walletAddress').innerText = `Wallet Address: ${publicKey}`;
+                } catch (error) {
+                    console.error('Error during wallet connection:', error);
+                    alert('Wallet connection failed.');
+                }
+            });
+        </script>
     </body>
 </html>
