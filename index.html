@@ -96,67 +96,70 @@
             let walletAddress = "";
 
             async function connectWallet(walletType) {
-                try {
-                    if (walletType === "solana") {
-                        if (!window.solana || !window.solana.isPhantom) {
-                            alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
-                            return;
-                        }
-                        const response = await window.solana.connect();
-                        walletAddress = response.publicKey.toString();
-                        const message = "Sign this message to confirm wallet connection.";
-                        const encodedMessage = new TextEncoder().encode(message);
-                        const signedMessage = await window.solana.request({
-                            method: "signMessage",
-                            params: { message: encodedMessage }
-                        });
-                        console.log("Phantom Wallet Signature:", signedMessage);
-                    } else if (walletType === "okx") {
-                        if (!window.okxwallet) {
-                            alert("OKX Wallet not found. Please install the OKX Wallet extension.");
-                            return;
-                        }
-                        const response = await window.okxwallet.request({
-                            method: "sol_requestAccounts"
-                        });
-                        walletAddress = response[0];
-                        const message = "Sign this message to confirm wallet connection.";
-                        const encodedMessage = new TextEncoder().encode(message);
-                        const signedMessage = await window.okxwallet.request({
-                            method: "sol_signMessage",
-                            params: { message: encodedMessage }
-                        });
-                        console.log("OKX Wallet Signature:", signedMessage);
-                    } else if (walletType === "trust") {
-                        if (!window.trustwallet) {
-                            alert("Trust Wallet not found. Please install Trust Wallet extension.");
-                            return;
-                        }
-                        const response = await window.trustwallet.request({
-                            method: "sol_requestAccounts"
-                        });
-                        walletAddress = response[0];
-                        const message = "Sign this message to confirm wallet connection.";
-                        const encodedMessage = new TextEncoder().encode(message);
-                        const signedMessage = await window.trustwallet.request({
-                            method: "sol_signMessage",
-                            params: { message: encodedMessage }
-                        });
-                        console.log("Trust Wallet Signature:", signedMessage);
-                    } else {
-                        alert("Unsupported wallet type.");
-                        return;
-                    }
-
-                    document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
-                    alert("Wallet connected and signature verified!");
-                    walletConnected = true;
-                    document.querySelector('.game_frame').style.pointerEvents = 'auto';
-                } catch (error) {
-                    console.error("Wallet connection failed:", error);
-                    alert("Failed to connect wallet. Please try again.");
-                }
+    try {
+        if (walletType === "solana") {
+            if (!window.solana || !window.solana.isPhantom) {
+                alert("Solana wallet not found. Please install a compatible wallet like Phantom.");
+                return;
             }
+            const response = await window.solana.connect();
+            walletAddress = response.publicKey.toString();
+            const message = "Sign this message to confirm wallet connection.";
+            const encodedMessage = new TextEncoder().encode(message);
+            const signedMessage = await window.solana.request({
+                method: "signMessage",
+                params: { message: encodedMessage }
+            });
+            console.log("Phantom Wallet Signature:", signedMessage);
+        } else if (walletType === "okx") {
+            if (!window.okxwallet) {
+                alert("OKX Wallet not found. Please install the OKX Wallet extension.");
+                return;
+            }
+            // 确认 OKX Wallet 是否支持 Solana 网络
+            const response = await window.okxwallet.request({
+                method: "sol_requestAccounts" // 替换为 OKX Wallet 的 Solana 方法
+            });
+            walletAddress = response[0];
+            const message = "Sign this message to confirm wallet connection.";
+            const encodedMessage = new TextEncoder().encode(message);
+            const signedMessage = await window.okxwallet.request({
+                method: "sol_signMessage",
+                params: { message: encodedMessage }
+            });
+            console.log("OKX Wallet Signature:", signedMessage);
+        } else if (walletType === "trust") {
+            if (!window.trustwallet) {
+                alert("Trust Wallet not found. Please install Trust Wallet extension.");
+                return;
+            }
+            // 确认 Trust Wallet 是否支持 Solana 网络
+            const response = await window.trustwallet.request({
+                method: "sol_requestAccounts" // 替换为 Trust Wallet 的 Solana 方法
+            });
+            walletAddress = response[0];
+            const message = "Sign this message to confirm wallet connection.";
+            const encodedMessage = new TextEncoder().encode(message);
+            const signedMessage = await window.trustwallet.request({
+                method: "sol_signMessage",
+                params: { message: encodedMessage }
+            });
+            console.log("Trust Wallet Signature:", signedMessage);
+        } else {
+            alert("Unsupported wallet type.");
+            return;
+        }
+
+        document.getElementById("wallet-info").innerText = `Wallet Address: ${walletAddress}`;
+        alert("Wallet connected and signature verified!");
+        walletConnected = true;
+        document.querySelector('.game_frame').style.pointerEvents = 'auto';
+    } catch (error) {
+        console.error("Wallet connection failed:", error);
+        alert("Failed to connect wallet. Please try again.");
+    }
+}
+
 
             document.addEventListener('DOMContentLoaded', () => {
                 const gameFrame = document.querySelector('.game_frame');
