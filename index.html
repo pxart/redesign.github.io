@@ -10,111 +10,69 @@
                 margin: 0;
                 font-family: Inter, sans-serif;
                 background-color: #252525;
-                background-image: url(https://img.itch.zone/aW1nLzE3MjY2NjA0LmpwZw==/original/RcoHTc.jpg);
-                background-repeat: repeat-x;
-                background-position: center;
-                background-attachment: fixed;
-                color: #ffffff;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
+                color: #ffffff;
             }
             .game_frame {
                 width: 100%;
                 max-width: 960px;
-                height: calc(100vw * 0.625); /* Maintain 16:10 aspect ratio */
+                height: calc(100vw * 0.625);
                 max-height: 600px;
                 background-color: #2b2b2b;
                 position: relative;
             }
-            .fullscreen_btn {
+            .fullscreen_btn, .wallet_btn {
                 position: absolute;
                 top: 10px;
-                right: 50px; /* Adjusted to leave space for wallet icon */
                 background: none;
                 border: none;
                 cursor: pointer;
             }
-            .fullscreen_btn img {
-                width: 24px;
-                height: 24px;
+            .fullscreen_btn {
+                right: 50px;
             }
             .wallet_btn {
-                position: absolute;
-                top: 10px;
                 right: 10px;
-                background: none;
-                border: none;
-                cursor: pointer;
             }
-            .wallet_btn img {
+            .fullscreen_btn img, .wallet_btn img {
                 width: 24px;
                 height: 24px;
             }
-            .description {
-                padding: 40px 20px; /* Increased padding for height */
-                text-align: center;
-                font-size: 1rem;
-                background-color: #2b2b2b;
-                color: #ffffff;
-                width: 100%;
-                max-width: 960px;
-                box-sizing: border-box;
-            }
-            .description h1 {
-                margin: 0;
-                font-size: 2rem;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
-            .description img {
-                margin-top: 20px;
-                width: 100px;
-                height: 65px;
-                cursor: pointer;
-            }
-            iframe {
-                width: 100%;
-                height: 100%;
-                border: none;
-            }
         </style>
-<script>
-    async function connectWallet() {
-        try {
-            if (window.solana && window.solana.isPhantom) {
-                const response = await window.solana.connect();
-                const publicKey = response.publicKey.toString();
-                alert(`Wallet connected: ${publicKey}`);
+        <script>
+            async function connectWallet() {
+                try {
+                    if (window.solana && window.solana.isPhantom) {
+                        const response = await window.solana.connect();
+                        const publicKey = response.publicKey.toString();
+                        alert(`Wallet connected: ${publicKey}`);
 
-                // Requesting a signature through the browser extension
-                const message = "Sign this message to verify your wallet.";
-                const encodedMessage = new TextEncoder().encode(message);
-                const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
+                        // Requesting a signature via Phantom extension
+                        const message = "Sign this message to verify your wallet.";
+                        const encodedMessage = new TextEncoder().encode(message);
+                        const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
 
-                console.log("Signature: ", signedMessage);
-            } else {
-                alert("Phantom wallet not found. Redirecting to Phantom app...");
+                        console.log("Signature:", signedMessage);
+                    } else {
+                        alert("Redirecting to Phantom app for signing...");
 
-                // Construct the deep link for signing
-                const message = "Sign this message to verify your wallet.";
-                const encodedMessage = btoa(message); // Convert to Base64 for Phantom
-                const redirectURL = encodeURIComponent("https://your-dapp-url.com"); // Your app's return URL
-                const phantomURI = `phantom://v1/sign?request=${encodedMessage}&redirect=${redirectURL}`;
+                        // Mobile Phantom App deep link
+                        const message = "Sign this message to verify your wallet.";
+                        const encodedMessage = btoa(message); // Convert to Base64
+                        const redirectURL = encodeURIComponent(window.location.href); // Return to current URL
+                        const phantomURI = `phantom://v1/sign?request=${encodedMessage}&redirect=${redirectURL}`;
 
-                // Redirect to Phantom
-                window.location.href = phantomURI;
+                        // Redirect to Phantom
+                        window.location.href = phantomURI;
+                    }
+                } catch (err) {
+                    console.error("Wallet connection failed:", err);
+                }
             }
-        } catch (err) {
-            console.error("Wallet connection failed:", err);
-        }
-    }
-</script>
-
-
-
         </script>
     </head>
     <body>
@@ -130,16 +88,6 @@
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
                 allowfullscreen>
             </iframe>
-        </div>
-        <div class="description">
-            <h1>GAME</h1>
-            <p>
-                Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
-            </p>
-            <p><em>Note: plays best with mouse or controller. Touch input not fully supported.</em></p>
-            <a href="https://example.com" target="_blank">
-                <img src="https://via.placeholder.com/100x65" alt="Link Image" />
-            </a>
         </div>
     </body>
 </html>
