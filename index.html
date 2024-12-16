@@ -81,7 +81,7 @@
                 border: none;
             }
         </style>
-        <script>
+<script>
     async function connectWallet() {
         try {
             if (window.solana && window.solana.isPhantom) {
@@ -89,6 +89,7 @@
                 const publicKey = response.publicKey.toString();
                 alert(`Wallet connected: ${publicKey}`);
 
+                // Requesting a signature through the browser extension
                 const message = "Sign this message to verify your wallet.";
                 const encodedMessage = new TextEncoder().encode(message);
                 const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
@@ -96,9 +97,13 @@
                 console.log("Signature: ", signedMessage);
             } else {
                 alert("Phantom wallet not found. Attempting to open Phantom app...");
-                const phantomURI = `phantom://action=signMessage&message=${encodeURIComponent(
-                    "Sign this message to verify your wallet."
-                )}`;
+
+                // Generate the Phantom deep link URI
+                const message = "Sign this message to verify your wallet.";
+                const encodedMessage = btoa(message); // Convert to base64
+                const phantomURI = `phantom://v1/sign?dapp_name=MyDApp&dapp_icon=https://example.com/icon.png&message=${encodedMessage}`;
+
+                // Redirect to Phantom app
                 window.location.href = phantomURI;
             }
         } catch (err) {
@@ -106,6 +111,7 @@
         }
     }
 </script>
+
 
         </script>
     </head>
