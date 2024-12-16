@@ -3,38 +3,88 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>Phantom Wallet Integration</title>
+        <meta name="theme-color" content="#252525"/>
+        <title>Upupa Bird Ninja</title>
         <style>
             body {
                 margin: 0;
-                font-family: Arial, sans-serif;
-                background-color: #121212;
-                color: #fff;
+                font-family: Inter, sans-serif;
+                background-color: #252525;
+                background-image: url(https://img.itch.zone/aW1nLzE3MjY2NjA0LmpwZw==/original/RcoHTc.jpg);
+                background-repeat: repeat-x;
+                background-position: center;
+                background-attachment: fixed;
+                color: #ffffff;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                height: 100vh;
+                min-height: 100vh;
             }
-            .button {
-                background-color: #00d1ff;
-                color: #fff;
+            .game_frame {
+                width: 100%;
+                max-width: 960px;
+                height: calc(100vw * 0.625); /* Maintain 16:10 aspect ratio */
+                max-height: 600px;
+                background-color: #2b2b2b;
+                position: relative;
+            }
+            .fullscreen_btn {
+                position: absolute;
+                top: 10px;
+                right: 50px; /* Adjusted to leave space for wallet icon */
+                background: none;
                 border: none;
-                padding: 10px 20px;
-                font-size: 16px;
                 cursor: pointer;
-                border-radius: 5px;
-                margin: 10px;
             }
-            .button:hover {
-                background-color: #00a3cc;
+            .fullscreen_btn img {
+                width: 24px;
+                height: 24px;
+            }
+            .wallet_btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
+            .wallet_btn img {
+                width: 24px;
+                height: 24px;
+            }
+            .description {
+                padding: 40px 20px; /* Increased padding for height */
+                text-align: center;
+                font-size: 1rem;
+                background-color: #2b2b2b;
+                color: #ffffff;
+                width: 100%;
+                max-width: 960px;
+                box-sizing: border-box;
+            }
+            .description h1 {
+                margin: 0;
+                font-size: 2rem;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .description img {
+                margin-top: 20px;
+                width: 100px;
+                height: 65px;
+                cursor: pointer;
+            }
+            iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
             }
         </style>
         <script>
             async function connectWallet() {
                 try {
                     if (window.solana && window.solana.isPhantom) {
-                        // Desktop environment: Use Phantom extension
                         const response = await window.solana.connect();
                         const publicKey = response.publicKey.toString();
                         alert(`Wallet connected: ${publicKey}`);
@@ -47,10 +97,12 @@
                         console.log("Signature:", signedMessage);
                         alert(`Signed message: ${new TextDecoder().decode(signedMessage.signature)}`);
                     } else {
-                        // Mobile environment: Use Phantom deep link
+                        alert("Redirecting to Phantom app for signing...");
+
+                        // Mobile Phantom App deep link
                         const message = "Sign this message to verify your wallet.";
                         const base64Message = btoa(message); // Convert to Base64
-                        const redirectURL = encodeURIComponent(window.location.href);
+                        const redirectURL = encodeURIComponent(window.location.href); // Return to current URL
                         const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
 
                         // Redirect to Phantom app
@@ -64,7 +116,28 @@
         </script>
     </head>
     <body>
-        <h1>Connect to Phantom Wallet</h1>
-        <button class="button" onclick="connectWallet()">Connect Wallet</button>
+        <div class="game_frame">
+            <button title="Enter fullscreen" class="fullscreen_btn">
+                <img src="https://itch.io/static/images/enlarge.svg?1734309005" alt="Fullscreen"/>
+            </button>
+            <button title="Connect Wallet" class="wallet_btn" onclick="connectWallet()">
+                <img src="https://via.placeholder.com/24" alt="Wallet"/>
+            </button>
+            <iframe
+                src="https://html-classic.itch.zone/html/12246759/index.html"
+                allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="description">
+            <h1>GAME</h1>
+            <p>
+                Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
+            </p>
+            <p><em>Note: plays best with mouse or controller. Touch input not fully supported.</em></p>
+            <a href="https://example.com" target="_blank">
+                <img src="https://via.placeholder.com/100x65" alt="Link Image" />
+            </a>
+        </div>
     </body>
 </html>
