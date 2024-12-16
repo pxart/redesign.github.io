@@ -3,91 +3,68 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta name="theme-color" content="#252525"/>
-        <title>Upupa Bird Ninja</title>
+        <title>Phantom Wallet Integration</title>
         <style>
             body {
                 margin: 0;
-                font-family: Inter, sans-serif;
-                background-color: #252525;
+                font-family: Arial, sans-serif;
+                background-color: #121212;
+                color: #fff;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                min-height: 100vh;
-                color: #ffffff;
+                height: 100vh;
             }
-            .game_frame {
-                width: 100%;
-                max-width: 960px;
-                height: calc(100vw * 0.625);
-                max-height: 600px;
-                background-color: #2b2b2b;
-                position: relative;
-            }
-            .fullscreen_btn, .wallet_btn {
-                position: absolute;
-                top: 10px;
-                background: none;
+            .button {
+                background-color: #00d1ff;
+                color: #fff;
                 border: none;
+                padding: 10px 20px;
+                font-size: 16px;
                 cursor: pointer;
+                border-radius: 5px;
+                margin: 10px;
             }
-            .fullscreen_btn {
-                right: 50px;
-            }
-            .wallet_btn {
-                right: 10px;
-            }
-            .fullscreen_btn img, .wallet_btn img {
-                width: 24px;
-                height: 24px;
+            .button:hover {
+                background-color: #00a3cc;
             }
         </style>
         <script>
             async function connectWallet() {
                 try {
                     if (window.solana && window.solana.isPhantom) {
+                        // Desktop environment: Use Phantom extension
                         const response = await window.solana.connect();
                         const publicKey = response.publicKey.toString();
                         alert(`Wallet connected: ${publicKey}`);
 
-                        // Requesting a signature via Phantom extension
+                        // Request signature
                         const message = "Sign this message to verify your wallet.";
                         const encodedMessage = new TextEncoder().encode(message);
                         const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
 
                         console.log("Signature:", signedMessage);
+                        alert(`Signed message: ${new TextDecoder().decode(signedMessage.signature)}`);
                     } else {
-                        alert("Redirecting to Phantom app for signing...");
-
-                        // Mobile Phantom App deep link
+                        // Mobile environment: Use Phantom deep link
                         const message = "Sign this message to verify your wallet.";
-                        const encodedMessage = btoa(message); // Convert to Base64
-                        const redirectURL = encodeURIComponent(window.location.href); // Return to current URL
-                        const phantomURI = `phantom://v1/sign?request=${encodedMessage}&redirect=${redirectURL}`;
+                        const base64Message = btoa(message); // Convert to Base64
+                        const redirectURL = encodeURIComponent(window.location.href);
+                        const phantomURI = `phantom://v1/sign?request=${base64Message}&redirect=${redirectURL}`;
 
-                        // Redirect to Phantom
+                        // Redirect to Phantom app
                         window.location.href = phantomURI;
                     }
                 } catch (err) {
                     console.error("Wallet connection failed:", err);
+                    alert("Wallet connection failed. Please try again.");
                 }
             }
         </script>
     </head>
     <body>
-        <div class="game_frame">
-            <button title="Enter fullscreen" class="fullscreen_btn">
-                <img src="https://itch.io/static/images/enlarge.svg?1734309005" alt="Fullscreen"/>
-            </button>
-            <button title="Connect Wallet" class="wallet_btn" onclick="connectWallet()">
-                <img src="https://via.placeholder.com/24" alt="Wallet"/>
-            </button>
-            <iframe
-                src="https://html-classic.itch.zone/html/12246759/index.html"
-                allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
-                allowfullscreen>
-            </iframe>
-        </div>
+        <h1>Connect to Phantom Wallet</h1>
+        <button class="button" onclick="connectWallet()">Connect Wallet</button>
     </body>
 </html>
