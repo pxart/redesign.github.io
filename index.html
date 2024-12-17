@@ -46,7 +46,7 @@
                 position: absolute;
                 bottom: 5.55%;
                 left: 3.5%;
-                width: 26%; /* 初始寬度設為25% */
+                width: 26%; /* Initial width set to 25% */
                 height: 6.5%;
                 opacity: 0;
                 transition: opacity 1s ease-in-out;
@@ -55,7 +55,7 @@
                 width: 100%;
                 height: 100%;
                 cursor: pointer;
-                transition: width 1s ease-in-out; /* 添加平滑縮放效果 */
+                transition: width 1s ease-in-out; /* Smooth resizing effect */
             }
             .wallet_icon_game.shrink {
                 width: 70%; 
@@ -79,7 +79,7 @@
                 padding: 40px 20px;
                 text-align: center;
                 font-size: 1rem;
-                background-color: #2b2b2b;
+                background-color:rgba(43, 43, 43, 0.8);
                 color: #ffffff;
                 width: 100%;
                 max-width: 960px;
@@ -89,7 +89,7 @@
             .wallet_icon_desc {
                 position: absolute;
                 top: 0px;
-                right: 25px;
+                right: 20px;
                 width: 80px;
                 height: 50px;
                 cursor: pointer;
@@ -100,9 +100,15 @@
             }
             .description h1 {
                 margin: 0;
-                font-size: 2rem;
-                font-weight: bold;
-                text-transform: uppercase;
+                display: inline-block;
+            }
+            .game_logo {
+                width: 80px;
+                height: 50px;
+                margin-bottom: 0px;
+            }
+            .description p {
+             margin-top: 0;
             }
             .description img {
                 margin-top: 20px;
@@ -113,15 +119,12 @@
             .wallet_address {
                 margin-top: 10px;
                 color: #00ff00;
-                font-size: 2rem;
+                font-size: 1rem;
             }
         </style>
     </head>
     <body>
         <div class="game_frame">
-            <button title="Enter fullscreen" class="fullscreen_btn">
-                <img src="https://itch.io/static/images/enlarge.svg?1734309005" alt="Fullscreen"/>
-            </button>
             <!-- Wallet Icon with Overlay Text -->
             <div class="wallet_icon_wrapper" id="walletIconWrapper">
                 <img src="https://krseoul.imgtbl.com/i/2024/12/17/67617d8dec819.png" alt="Wallet" class="wallet_icon_game" />
@@ -134,8 +137,9 @@
             </iframe>
         </div>
         <div class="description">
-            <img src="https://via.placeholder.com/50x80" alt="Wallet" class="wallet_icon_desc" id="walletIcon" />
-            <h1>GAME</h1>
+            <img src="https://krseoul.imgtbl.com/i/2024/12/17/67618129c8066.png" alt="Wallet" class="wallet_icon_desc" id="walletIcon" />
+            <!-- 新增圖片替代GAME文字 -->
+            <img src="https://krseoul.imgtbl.com/i/2024/12/17/6761850f6bd03.png" alt="Game Logo" class="game_logo" />
             <p>
                 Slice through hordes of enemies as you navigate Upupa the hoopoe through their final trial to bring light to the top of the tower and keep evil at bay for another generation. Upupa Bird Ninja is a fast-paced tough-as-talons adventure.
             </p>
@@ -147,19 +151,19 @@
         </div>
 
         <script>
-            // 初始顯示錢包圖標
+            // Initial display of the wallet icon
             setTimeout(() => {
                 const walletIconWrapper = document.getElementById('walletIconWrapper');
                 walletIconWrapper.style.opacity = '1';
             }, 1250);
 
-            // 30秒後縮小錢包圖標的寬度至18%
+            // Reduce wallet icon size after 30 seconds
             setTimeout(() => {
                 const walletIconGame = document.querySelector('.wallet_icon_game');
-                walletIconGame.classList.add('shrink'); // 添加縮放class
+                walletIconGame.classList.add('shrink');
             }, 60000);
 
-            // 錢包連接功能
+            // Wallet connection functionality
             document.getElementById('walletIcon').addEventListener('click', async () => {
                 if (!window.solana || !window.solana.isPhantom) {
                     alert('Phantom wallet not detected. Please install it from the Chrome Web Store.');
