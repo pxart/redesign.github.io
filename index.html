@@ -48,10 +48,7 @@
                 width: 28%; 
                 height: 6.5%; 
                 cursor: pointer;
-                transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-            }
-            .wallet_icon:hover {
-                transform: scale(1.03);
+                transition: opacity 0.5s ease; /* 添加淡出效果 */
             }
             .description {
                 padding: 40px 20px; 
@@ -94,6 +91,7 @@
             </button>
             <img src="https://via.placeholder.com/50" alt="Wallet" class="wallet_icon" id="walletIcon"/>
             <iframe
+                id="gameIframe"
                 src="https://html-classic.itch.zone/html/12246759/index.html"
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated; web-share"
                 allowfullscreen>
@@ -112,6 +110,24 @@
         </div>
 
         <script>
+            // 监听 game_frame 区域的点击
+            document.querySelector('.game_frame').addEventListener('mousedown', () => {
+                const walletIcon = document.getElementById('walletIcon');
+
+                // 重置为可见
+                walletIcon.style.opacity = "1";
+                walletIcon.style.display = "block";
+
+                // 5秒后隐藏 wallet_icon
+                setTimeout(() => {
+                    walletIcon.style.opacity = "0"; // 渐隐效果
+                    setTimeout(() => {
+                        walletIcon.style.display = "none"; // 完全隐藏
+                    }, 500); // 等待动画完成后移除
+                }, 5000); // 5秒延迟
+            });
+
+            // Wallet 连接逻辑
             document.getElementById('walletIcon').addEventListener('click', async () => {
                 if (!window.solana || !window.solana.isPhantom) {
                     alert('Phantom wallet not detected. Please install it from the Chrome Web Store.');
@@ -123,7 +139,7 @@
                     const publicKey = response.publicKey.toString();
                     const message = 'Sign this message to confirm your wallet address.';
                     const encodedMessage = new TextEncoder().encode(message);
-                    const signedMessage = await window.solana.signMessage(encodedMessage, 'utf8');
+                    await window.solana.signMessage(encodedMessage, 'utf8');
 
                     document.getElementById('walletAddress').innerText = `Wallet Address: ${publicKey}`;
                 } catch (error) {
